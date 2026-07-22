@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Research Agent — IBM watsonx</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #3b82f6;
+      --blue-dark:  #1d4ed8;
+      --blue-light: #eff6ff;
+      --purple:     #7c3aed;
+      --surface:    #f8fafc;
+      --white:      #ffffff;
+      --border:     #e2e8f0;
+      --text:       #0f172a;
+      --muted:      #64748b;
+      --green:      #22c55e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, "Segoe UI", system-ui, sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ══════════════════════════════
+       HEADER
+    ══════════════════════════════ */
+    header {
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .logo-text { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+    .logo-text em { font-style: normal; color: var(--blue); }
+
+    .header-right { display: flex; align-items: center; gap: 14px; }
+
+    .badge {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.4px;
+      padding: 4px 12px; border-radius: 20px;
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+      color: var(--blue); border: 1px solid #c7d2fe;
+    }
+
+    .nav-link {
+      font-size: 13px; font-weight: 500; color: var(--muted);
+      text-decoration: none; padding: 6px 12px; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-link:hover { color: var(--blue); background: var(--blue-light); }
+
+    /* ══════════════════════════════
+       HERO
+    ══════════════════════════════ */
+    .hero {
+      position: relative;
+      background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 55%, #312e81 100%);
+      overflow: hidden;
+      padding: 72px 32px 60px;
+      text-align: center;
+    }
+
+    /* SVG grid overlay */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Glow orbs */
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.35;
+    }
+    .hero-orb-1 { width: 400px; height: 400px; background: #3b82f6; top: -120px; left: -80px; }
+    .hero-orb-2 { width: 350px; height: 350px; background: #7c3aed; bottom: -100px; right: -60px; }
+
+    .hero-content { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 12px; font-weight: 600; color: #93c5fd;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+
+    .hero-eyebrow-dot { width: 6px; height: 6px; background: #22d3ee; border-radius: 50%; }
+
+    .hero h1 {
+      font-size: 46px; font-weight: 800; color: #ffffff;
+      line-height: 1.15; letter-spacing: -1px; margin-bottom: 18px;
+    }
+
+    .hero h1 .gradient-text {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 16px; color: #94a3b8; line-height: 1.8;
+      max-width: 500px; margin: 0 auto 36px;
+    }
+
+    .capabilities {
+      display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    }
+
+    .cap-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px; padding: 7px 16px;
+      font-size: 13px; color: #e2e8f0; font-weight: 500;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .cap-pill:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+    .cap-pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .dot-blue   { background: #60a5fa; }
+    .dot-purple { background: #a78bfa; }
+    .dot-teal   { background: #34d399; }
+    .dot-amber  { background: #fbbf24; }
+
+    /* ══════════════════════════════
+       STATS STRIP
+    ══════════════════════════════ */
+    .stats-strip {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex; justify-content: center;
+    }
+
+    .stats-inner {
+      display: flex; gap: 0; max-width: 800px; width: 100%;
+    }
+
+    .stat {
+      flex: 1; text-align: center;
+      padding: 22px 16px;
+      border-right: 1px solid var(--border);
+      position: relative;
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-value {
+      font-size: 24px; font-weight: 800;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.5px;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 3px; font-weight: 500; }
+
+    /* ══════════════════════════════
+       MAIN LAYOUT
+    ══════════════════════════════ */
+    .main {
+      flex: 1; display: flex;
+      max-width: 1180px; width: 100%;
+      margin: 32px auto; padding: 0 28px;
+      gap: 24px; align-items: flex-start;
+    }
+
+    /* ══════════════════════════════
+       SIDEBAR
+    ══════════════════════════════ */
+    .sidebar { width: 248px; flex-shrink: 0; display: flex; flex-direction: column; gap: 18px; }
+
+    .sidebar-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .sidebar-card-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    }
+
+    .sidebar-card-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .icon-blue   { background: #eff6ff; }
+    .icon-purple { background: #f5f3ff; }
+
+    .sidebar-card h3 {
+      font-size: 12px; font-weight: 700; color: var(--text);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .tip-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .tip-list li {
+      font-size: 13px; color: var(--muted); line-height: 1.5;
+      padding: 8px 10px 8px 12px;
+      background: var(--surface); border-radius: 7px;
+      border-left: 3px solid var(--blue);
+      position: relative;
+    }
+
+    .topic-btn {
+      display: flex; align-items: center; gap: 8px;
+      width: 100%; text-align: left;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px;
+      font-size: 13px; color: var(--text); cursor: pointer;
+      margin-bottom: 7px; font-family: inherit; font-weight: 500;
+      transition: all 0.15s;
+    }
+    .topic-btn:last-child { margin-bottom: 0; }
+    .topic-btn:hover {
+      background: var(--blue-light); border-color: #bfdbfe;
+      color: var(--blue); transform: translateX(2px);
+    }
+    .topic-arrow { margin-left: auto; color: var(--muted); font-size: 14px; transition: transform 0.15s; }
+    .topic-btn:hover .topic-arrow { transform: translateX(3px); color: var(--blue); }
+
+    /* ══════════════════════════════
+       CHAT PANEL
+    ══════════════════════════════ */
+    .chat-panel {
+      flex: 1; min-width: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 620px;
+      box-shadow: 0 4px 24px rgba(59,130,246,0.08), 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .chat-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, #f8faff 0%, #faf7ff 100%);
+    }
+
+    .chat-header-left { display: flex; align-items: center; gap: 12px; }
+
+    .agent-avatar {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .chat-info-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .chat-info-sub {
+      font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px;
+    }
+
+    .pulse-dot {
+      width: 7px; height: 7px; background: var(--green);
+      border-radius: 50%; position: relative;
+    }
+    .pulse-dot::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: 50%;
+      border: 2px solid var(--green);
+      opacity: 0.4;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 0.4; }
+      50%      { transform: scale(1.5); opacity: 0; }
+    }
+
+    .chat-header-right {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .watsonx-badge {
+      display: flex; align-items: center; gap: 6px;
+      background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+      border: 1px solid #c7d2fe; border-radius: 8px;
+      padding: 5px 10px; font-size: 11px; font-weight: 600; color: var(--blue);
+    }
+
+    /* watsonx chat widget container */
+    #root {
+      flex: 1;
+      min-height: 560px;
+      width: 100%;
+      position: relative;
+    }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    footer {
+      text-align: center; padding: 20px 24px;
+      font-size: 12px; color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--white);
+    }
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ══════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════ */
+    @media (max-width: 860px) {
+      .main { flex-direction: column; padding: 0 16px; }
+      .sidebar { width: 100%; flex-direction: row; flex-wrap: wrap; gap: 14px; }
+      .sidebar-card { flex: 1; min-width: 220px; }
+      .hero h1 { font-size: 30px; }
+      .stats-inner { gap: 0; }
+      header { padding: 0 20px; }
+      .nav-link { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 24px; }
+      .hero { padding: 50px 20px 40px; }
+      .stats-strip { padding: 0 16px; }
+      .stat-value { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <a class="logo" href="#">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#fff" stroke-width="2"/>
+          <line x1="15.5" y1="15.5" x2="22" y2="22" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="10" cy="10" r="3" fill="rgba(255,255,255,0.4)"/>
+        </svg>
+      </div>
+      <span class="logo-text">Research<em>Agent</em></span>
+    </a>
+    <div class="header-right">
+      <a class="nav-link" href="#">About</a>
+      <a class="nav-link" href="#">Docs</a>
+      <span class="badge">&#9679;&nbsp; IBM watsonx</span>
+    </div>
+  </header>
+
+  <!-- ── Hero ── -->
+  <section class="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        AI-Powered Research Platform
+      </div>
+      <h1>
+        Discover Insights with<br>
+        <span class="gradient-text">Intelligent Research</span>
+      </h1>
+      <p>Ask complex questions, explore topics in depth, and receive structured, reliable answers powered by IBM watsonx Orchestrate.</p>
+      <div class="capabilities">
+        <div class="cap-pill"><span class="cap-pill-dot dot-blue"></span> Deep Research</div>
+        <div class="cap-pill"><span class="cap-pill-dot dot-purple"></span> Multi-Source Analysis</div>
+        <div class="cap-pill"><span class="cap-pill-dot dot-teal"></span> Structured Summaries</div>
+        <div class="cap-pill"><span class="cap-pill-dot dot-amber"></span> Real-Time Answers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ── -->
+  <div class="stats-strip">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-value">24 / 7</div>
+        <div class="stat-label">Always Available</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">watsonx</div>
+        <div class="stat-label">IBM AI Platform</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">&lt; 2s</div>
+        <div class="stat-label">Avg. Response Time</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">&#8734;</div>
+        <div class="stat-label">Topics Covered</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main ── -->
+  <div class="main">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <div class="sidebar-card-icon icon-blue">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 1.5a.5.5 0 0 1 .45.28l1.7 3.44 3.8.55a.5.5 0 0 1 .28.85L11.5 9.26l.65 3.79a.5.5 0 0 1-.73.53L8 11.76l-3.42 1.8a.5.5 0 0 1-.73-.53l.65-3.79L1.77 6.62a.5.5 0 0 1 .28-.85l3.8-.55L7.55 1.78A.5.5 0 0 1 8 1.5z" fill="#3b82f6"/>
+            </svg>
+          </div>
+          <h3>Research Tips</h3>
+        </div>
+        <ul class="tip-list">
+          <li>Be specific with your research question</li>
+          <li>Ask for comparisons between concepts</li>
+          <li>Request citations or sources</li>
+          <li>Ask for pros &amp; cons breakdowns</li>
+          <li>Request summaries at different levels</li>
+        </ul>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-header">
+          <div class="sidebar-card-icon icon-purple">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <rect x="1" y="1" width="6" height="6" rx="1.5" fill="#7c3aed"/>
+              <rect x="9" y="1" width="6" height="6" rx="1.5" fill="#7c3aed" opacity="0.5"/>
+              <rect x="1" y="9" width="6" height="6" rx="1.5" fill="#7c3aed" opacity="0.5"/>
+              <rect x="9" y="9" width="6" height="6" rx="1.5" fill="#7c3aed"/>
+            </svg>
+          </div>
+          <h3>Sample Topics</h3>
+        </div>
+        <button class="topic-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b82f6" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Quantum Computing Basics
+          <span class="topic-arrow">›</span>
+        </button>
+        <button class="topic-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b82f6" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Climate Change Policy
+          <span class="topic-arrow">›</span>
+        </button>
+        <button class="topic-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b82f6" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          AI in Healthcare
+          <span class="topic-arrow">›</span>
+        </button>
+        <button class="topic-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b82f6" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Renewable Energy Trends
+          <span class="topic-arrow">›</span>
+        </button>
+        <button class="topic-btn">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="#3b82f6" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Blockchain Use Cases
+          <span class="topic-arrow">›</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="agent-avatar">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <circle cx="10" cy="10" r="6" stroke="#fff" stroke-width="1.8"/>
+              <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+              <circle cx="10" cy="10" r="2.5" fill="rgba(255,255,255,0.45)"/>
+            </svg>
+          </div>
+          <div>
+            <div class="chat-info-title">Research Agent</div>
+            <div class="chat-info-sub">
+              <span class="pulse-dot"></span>
+              Online &amp; ready to assist
+            </div>
+          </div>
+        </div>
+        <div class="chat-header-right">
+          <div class="watsonx-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            IBM watsonx Orchestrate
+          </div>
+        </div>
+      </div>
+
+      <!-- watsonx agent mounts here -->
+      <div id="root"></div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    Made with <strong>IBM Bob</strong> &nbsp;&middot;&nbsp;
+    Powered by <a href="https://www.ibm.com/watsonx">IBM watsonx Orchestrate</a> &nbsp;&middot;&nbsp;
+    &copy; 2025 ResearchAgent
+  </footer>
+
+  <!-- ✅ watsonx Orchestrate Embedded Agent -->
+  <script>
+    window.wxOConfiguration = {
+      orchestrationID: "d2fac2f53ea54e0aabe71b47d9cdbf9c_b5ae9bcb-acb1-4ca2-90c1-17022ac1f0b3",
+      hostURL: "https://au-syd.watson-orchestrate.cloud.ibm.com",
+      rootElementID: "root",
+      deploymentPlatform: "ibmcloud",
+      crn: "crn:v1:bluemix:public:watsonx-orchestrate:au-syd:a/d2fac2f53ea54e0aabe71b47d9cdbf9c:b5ae9bcb-acb1-4ca2-90c1-17022ac1f0b3::",
+      chatOptions: {
+        agentId: "9ae98863-533b-49b5-bbe9-b75675f2a199"
+      }
+    };
+    setTimeout(function () {
+      var script = document.createElement('script');
+      script.src = window.wxOConfiguration.hostURL + '/wxochat/wxoLoader.js?embed=true';
+      script.addEventListener('load', function () {
+        wxoLoader.init();
+      });
+      document.head.appendChild(script);
+    }, 0);
+  </script>
+
+</body>
+</html>
